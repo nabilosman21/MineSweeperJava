@@ -5,7 +5,7 @@ import java.util.Random;
 import javax.swing.*;
 
 public class Minesweeper {
-    private class MineTile extends JButton {
+    public class MineTile extends JButton {
         int row;
         int col;
 
@@ -15,24 +15,24 @@ public class Minesweeper {
         }
     }
 
-    private static final int TILE_SIZE = 70;
-    private static final int NUM_ROWS = 8;
-    private static final int NUM_COLS = NUM_ROWS;
-    private static final int BOARD_WIDTH = NUM_COLS * TILE_SIZE;
-    private static final int BOARD_HEIGHT = NUM_ROWS * TILE_SIZE;
-    private static final int MINE_COUNT = 10;
+    public static final int TILE_SIZE = 70;
+    public static final int NUM_ROWS = 8;
+    public static final int NUM_COLS = NUM_ROWS;
+    public static final int BOARD_WIDTH = NUM_COLS * TILE_SIZE;
+    public static final int BOARD_HEIGHT = NUM_ROWS * TILE_SIZE;
+    public static final int MINE_COUNT = 10;
 
-    private JFrame frame = new JFrame("Minesweeper");
-    private JLabel minesRemainingLabel = new JLabel();
-    private JPanel headerPanel = new JPanel();
-    private JPanel boardPanel = new JPanel();
+    public JFrame frame = new JFrame("Minesweeper");
+    public JLabel minesRemainingLabel = new JLabel();
+    public JPanel headerPanel = new JPanel();
+    public JPanel boardPanel = new JPanel();
 
-    private MineTile[][] board = new MineTile[NUM_ROWS][NUM_COLS];
-    private ArrayList<MineTile> mineList;
-    private Random random = new Random();
+    public MineTile[][] board = new MineTile[NUM_ROWS][NUM_COLS];
+    public ArrayList<MineTile> mineList;
+    public Random random = new Random();
 
-    private int tilesClicked = 0;
-    private boolean gameOver = false;
+    public int tilesClicked = 0;
+    public boolean gameOver = false;
 
     public Minesweeper() {
         frame.setSize(BOARD_WIDTH, BOARD_HEIGHT);
@@ -59,7 +59,7 @@ public class Minesweeper {
         setMines();
     }
 
-    private void initializeBoard() {
+    public void initializeBoard() {
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
                 MineTile tile = new MineTile(row, col);
@@ -99,7 +99,7 @@ public class Minesweeper {
         }
     }
 
-    private void setMines() {
+    public void setMines() {
         mineList = new ArrayList<>();
 
         int minesLeft = MINE_COUNT;
@@ -115,7 +115,7 @@ public class Minesweeper {
         }
     }
 
-    private void revealMines() {
+    public void revealMines() {
         for (MineTile mine : mineList) {
             mine.setText("💣");
         }
@@ -124,7 +124,7 @@ public class Minesweeper {
         minesRemainingLabel.setText("Game Over!");
     }
 
-    private void checkMine(int row, int col) {
+    public void checkMine(int row, int col) {
         if (row < 0 || row >= NUM_ROWS || col < 0 || col >= NUM_COLS) {
             return;
         }
@@ -172,7 +172,7 @@ public class Minesweeper {
         }
     }
 
-    private int countMine(int row, int col) {
+    public int countMine(int row, int col) {
         if (row < 0 || row >= NUM_ROWS || col < 0 || col >= NUM_COLS) {
             return 0;
         }
@@ -181,6 +181,4 @@ public class Minesweeper {
         }
         return 0;
     }
-
-
 }
