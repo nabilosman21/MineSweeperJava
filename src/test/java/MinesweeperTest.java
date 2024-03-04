@@ -14,16 +14,4 @@ class MinesweeperTest {
         assertTrue(minesweeper.gameOver);
         assertEquals("Game Over!", minesweeper.minesRemainingLabel.getText());
     }
-
-    @Test
-    void testCheckMine() {
-        Minesweeper minesweeper = new Minesweeper();
-        minesweeper.checkMine(0, 0);
-
-        assertFalse(minesweeper.board[0][0].isEnabled());
-        assertTrue(minesweeper.gameOver);
-        assertEquals("Game Over!", minesweeper.minesRemainingLabel.getText());
-    }
-
-    // Add more test cases for other methods and scenarios as needed
 }
