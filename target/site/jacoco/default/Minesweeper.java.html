@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Minesweeper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Minesweeper</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Minesweeper.java</span></div><h1>Minesweeper.java</h1><pre class="source lang-java linenums">import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.*;
+
+public class Minesweeper {
+    public class MineTile extends JButton {
+        int row;
+        int col;
+
+<span class="fc" id="L12">        public MineTile(int row, int col) {</span>
+<span class="fc" id="L13">            this.row = row;</span>
+<span class="fc" id="L14">            this.col = col;</span>
+<span class="fc" id="L15">        }</span>
+    }
+
+    public static final int TILE_SIZE = 70;
+    public static final int NUM_ROWS = 8;
+    public static final int NUM_COLS = NUM_ROWS;
+    public static final int BOARD_WIDTH = NUM_COLS * TILE_SIZE;
+    public static final int BOARD_HEIGHT = NUM_ROWS * TILE_SIZE;
+    public static final int MINE_COUNT = 10;
+
+<span class="fc" id="L25">    public JFrame frame = new JFrame(&quot;Minesweeper&quot;);</span>
+<span class="fc" id="L26">    public JLabel minesRemainingLabel = new JLabel();</span>
+<span class="fc" id="L27">    public JPanel headerPanel = new JPanel();</span>
+<span class="fc" id="L28">    public JPanel boardPanel = new JPanel();</span>
+
+<span class="fc" id="L30">    public MineTile[][] board = new MineTile[NUM_ROWS][NUM_COLS];</span>
+    public ArrayList&lt;MineTile&gt; mineList;
+<span class="fc" id="L32">    public Random random = new Random();</span>
+
+<span class="fc" id="L34">    public int tilesClicked = 0;</span>
+<span class="fc" id="L35">    public boolean gameOver = false;</span>
+
+<span class="fc" id="L37">    public Minesweeper() {</span>
+<span class="fc" id="L38">        frame.setSize(BOARD_WIDTH, BOARD_HEIGHT);</span>
+<span class="fc" id="L39">        frame.setLocationRelativeTo(null);</span>
+<span class="fc" id="L40">        frame.setResizable(false);</span>
+<span class="fc" id="L41">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L42">        frame.setLayout(new BorderLayout());</span>
+
+<span class="fc" id="L44">        minesRemainingLabel.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 25));</span>
+<span class="fc" id="L45">        minesRemainingLabel.setHorizontalAlignment(JLabel.CENTER);</span>
+<span class="fc" id="L46">        minesRemainingLabel.setText(&quot;Minesweeper: &quot; + MINE_COUNT);</span>
+<span class="fc" id="L47">        minesRemainingLabel.setOpaque(true);</span>
+
+<span class="fc" id="L49">        headerPanel.setLayout(new BorderLayout());</span>
+<span class="fc" id="L50">        headerPanel.add(minesRemainingLabel);</span>
+<span class="fc" id="L51">        frame.add(headerPanel, BorderLayout.NORTH);</span>
+
+<span class="fc" id="L53">        boardPanel.setLayout(new GridLayout(NUM_ROWS, NUM_COLS));</span>
+<span class="fc" id="L54">        frame.add(boardPanel);</span>
+
+<span class="fc" id="L56">        initializeBoard();</span>
+<span class="fc" id="L57">        frame.setVisible(true);</span>
+
+<span class="fc" id="L59">        setMines();</span>
+<span class="fc" id="L60">    }</span>
+
+    public void initializeBoard() {
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        for (int row = 0; row &lt; NUM_ROWS; row++) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            for (int col = 0; col &lt; NUM_COLS; col++) {</span>
+<span class="fc" id="L65">                MineTile tile = new MineTile(row, col);</span>
+<span class="fc" id="L66">                board[row][col] = tile;</span>
+
+<span class="fc" id="L68">                tile.setFocusable(false);</span>
+<span class="fc" id="L69">                tile.setMargin(new Insets(0, 0, 0, 0));</span>
+<span class="fc" id="L70">                tile.setFont(new Font(&quot;Arial Unicode MS&quot;, Font.PLAIN, 45));</span>
+<span class="fc" id="L71">                tile.addMouseListener(new MouseAdapter() {</span>
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                        if (gameOver) {</span>
+<span class="nc" id="L75">                            return;</span>
+                        }
+<span class="nc" id="L77">                        MineTile clickedTile = (MineTile) e.getSource();</span>
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">                        if (e.getButton() == MouseEvent.BUTTON1) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                            if (clickedTile.getText().isEmpty()) {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                                if (mineList.contains(clickedTile)) {</span>
+<span class="nc" id="L82">                                    revealMines();</span>
+                                } else {
+<span class="nc" id="L84">                                    checkMine(clickedTile.row, clickedTile.col);</span>
+                                }
+                            }
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                        } else if (e.getButton() == MouseEvent.BUTTON3) {</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                            if (clickedTile.getText().isEmpty() &amp;&amp; clickedTile.isEnabled()) {</span>
+<span class="nc" id="L89">                                clickedTile.setText(&quot;🚩&quot;);</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                            } else if (clickedTile.getText().equals(&quot;🚩&quot;)) {</span>
+<span class="nc" id="L91">                                clickedTile.setText(&quot;&quot;);</span>
+                            }
+                        }
+<span class="nc" id="L94">                    }</span>
+                });
+
+<span class="fc" id="L97">                boardPanel.add(tile);</span>
+            }
+        }
+<span class="fc" id="L100">    }</span>
+
+    public void setMines() {
+<span class="fc" id="L103">        mineList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L105">        int minesLeft = MINE_COUNT;</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        while (minesLeft &gt; 0) {</span>
+<span class="fc" id="L107">            int row = random.nextInt(NUM_ROWS);</span>
+<span class="fc" id="L108">            int col = random.nextInt(NUM_COLS);</span>
+
+<span class="fc" id="L110">            MineTile tile = board[row][col];</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            if (!mineList.contains(tile)) {</span>
+<span class="fc" id="L112">                mineList.add(tile);</span>
+<span class="fc" id="L113">                minesLeft--;</span>
+            }
+<span class="fc" id="L115">        }</span>
+<span class="fc" id="L116">    }</span>
+
+    public void revealMines() {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        for (MineTile mine : mineList) {</span>
+<span class="fc" id="L120">            mine.setText(&quot;💣&quot;);</span>
+<span class="fc" id="L121">        }</span>
+
+<span class="fc" id="L123">        gameOver = true;</span>
+<span class="fc" id="L124">        minesRemainingLabel.setText(&quot;Game Over!&quot;);</span>
+<span class="fc" id="L125">    }</span>
+
+    public void checkMine(int row, int col) {
+<span class="nc bnc" id="L128" title="All 8 branches missed.">        if (row &lt; 0 || row &gt;= NUM_ROWS || col &lt; 0 || col &gt;= NUM_COLS) {</span>
+<span class="nc" id="L129">            return;</span>
+        }
+
+<span class="nc" id="L132">        MineTile tile = board[row][col];</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (!tile.isEnabled()) {</span>
+<span class="nc" id="L134">            return;</span>
+        }
+<span class="nc" id="L136">        tile.setEnabled(false);</span>
+<span class="nc" id="L137">        tilesClicked += 1;</span>
+
+<span class="nc" id="L139">        int minesFound = 0;</span>
+
+<span class="nc" id="L141">        minesFound += countMine(row - 1, col - 1); // top left</span>
+<span class="nc" id="L142">        minesFound += countMine(row - 1, col); // top</span>
+<span class="nc" id="L143">        minesFound += countMine(row - 1, col + 1); // top right</span>
+
+<span class="nc" id="L145">        minesFound += countMine(row, col - 1); // left</span>
+<span class="nc" id="L146">        minesFound += countMine(row, col + 1); // right</span>
+
+<span class="nc" id="L148">        minesFound += countMine(row + 1, col - 1); // bottom left</span>
+<span class="nc" id="L149">        minesFound += countMine(row + 1, col); // bottom</span>
+<span class="nc" id="L150">        minesFound += countMine(row + 1, col + 1); // bottom right</span>
+
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (minesFound &gt; 0) {</span>
+<span class="nc" id="L153">            tile.setText(Integer.toString(minesFound));</span>
+        } else {
+<span class="nc" id="L155">            tile.setText(&quot;&quot;);</span>
+
+<span class="nc" id="L157">            checkMine(row - 1, col - 1); // top left</span>
+<span class="nc" id="L158">            checkMine(row - 1, col); // top</span>
+<span class="nc" id="L159">            checkMine(row - 1, col + 1); // top right</span>
+
+<span class="nc" id="L161">            checkMine(row, col - 1); // left</span>
+<span class="nc" id="L162">            checkMine(row, col + 1); // right</span>
+
+<span class="nc" id="L164">            checkMine(row + 1, col - 1); // bottom left</span>
+<span class="nc" id="L165">            checkMine(row + 1, col); // bottom</span>
+<span class="nc" id="L166">            checkMine(row + 1, col + 1); // bottom right</span>
+        }
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (tilesClicked == NUM_ROWS * NUM_COLS - mineList.size()) {</span>
+<span class="nc" id="L170">            gameOver = true;</span>
+<span class="nc" id="L171">            minesRemainingLabel.setText(&quot;Mines Cleared!&quot;);</span>
+        }
+<span class="nc" id="L173">    }</span>
+
+    public int countMine(int row, int col) {
+<span class="nc bnc" id="L176" title="All 8 branches missed.">        if (row &lt; 0 || row &gt;= NUM_ROWS || col &lt; 0 || col &gt;= NUM_COLS) {</span>
+<span class="nc" id="L177">            return 0;</span>
+        }
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (mineList.contains(board[row][col])) {</span>
+<span class="nc" id="L180">            return 1;</span>
+        }
+<span class="nc" id="L182">        return 0;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
